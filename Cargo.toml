@@ -9,7 +9,7 @@ description = 'dangobot'
 crate-type = ["rlib", "dylib"]
 
 [dependencies]
-discord = { path = "../discord-rs" }
-# discord = { git = "https://github.com/SpaceManiac/discord-rs" }
+#discord = { path = "../discord-rs" }
+discord = { git = "https://github.com/SpaceManiac/discord-rs" }
 libloading = "0.3"
 # discord = '0.6.0'
