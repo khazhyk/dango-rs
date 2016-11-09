@@ -1,0 +1,16 @@
+[package]
+name = 'wewmodule'
+version = '0.0.0'
+authors = ['khazhyk <khazhy@gmail.com>']
+
+description = 'wewmodule'
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]
+dango = { path = ".." }
+discord = { path = "../../discord-rs" }
+#discord = { git = "https://github.com/SpaceManiac/discord-rs" }
+libloading = "0.3"
+# discord = '0.6.0'

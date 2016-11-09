@@ -1,0 +1,15 @@
+[package]
+name = 'dango'
+version = '0.0.0'
+authors = ['khazhyk <khazhy@gmail.com>']
+
+description = 'dangobot'
+
+[lib]
+crate-type = ["rlib", "dylib"]
+
+[dependencies]
+discord = { path = "../discord-rs" }
+# discord = { git = "https://github.com/SpaceManiac/discord-rs" }
+libloading = "0.3"
+# discord = '0.6.0'
