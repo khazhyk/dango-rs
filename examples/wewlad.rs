@@ -20,7 +20,7 @@ pub fn main() {
 
 	let mut wew = Bot::new(discord);
 
-	wew.load_library("wewmodule/target/release/wewmodule").unwrap();
+	wew.load_library("wewmodule/target/debug/wewmodule").unwrap();
 
 	loop {
 		let event = match connection.recv_event() {
