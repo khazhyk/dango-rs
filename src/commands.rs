@@ -13,7 +13,7 @@ use error::Error;
 pub struct Context<'a> {
 	discord: Rc<Discord>,
 	message: &'a Message,
-	tokens: Vec<&'a str>,
+	pub tokens: Vec<&'a str>,
 }
 
 impl<'a> Context<'a> {
@@ -71,11 +71,13 @@ impl CommandHandler {
 
 			let mut tokens = rest.split(" ");
 
-			let cmd = tokens.next();
+			let cmd = tokens.next().unwrap();
+
+			println!("{}", &cmd);
 
 			let rest_tokens = tokens.collect();
 
-			match self.commands.get(&rest.to_owned()) {
+			match self.commands.get(&cmd.to_owned()) {
 				Some(command) => {
 					let context = Context {
 						discord: self.discord.clone(),
