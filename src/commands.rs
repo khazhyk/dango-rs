@@ -7,19 +7,32 @@ use discord::model::Message;
 use std::rc::Rc;
 use std::io;
 
-pub struct Context {
+use error::Result;
+use error::Error;
+
+pub struct Context<'a> {
 	discord: Rc<Discord>,
-	handler: CommandHandler,
+	message: &'a Message,
 }
 
+impl<'a> Context<'a> {
+	pub fn say<S: Into<String>>(&self, message: S) -> Result<Message> {
+		self.discord.send_message(&self.message.channel_id, &message.into(), "", false).map_err(Error::from)
+	}
+}
+
+pub type CommandInvoke = Fn(&Context) -> Result<()>;
+
 pub struct Command {
-	invoke: Box<Fn(&Discord, &Message)>
+	name: String,
+	invoke: Box<CommandInvoke>
 }
 
 impl Command {
-	pub fn new<F>(invoke: F) -> Command
-		where F: 'static + Fn(&Discord, &Message) {
+	pub fn new<S: Into<String>, F>(name: S, invoke: F) -> Command 
+		where F: 'static + Fn(&Context) -> Result<()> {
 		Command {
+			name: name.into(),
 			invoke: Box::new(invoke)
 		}
 	}
@@ -27,7 +40,7 @@ impl Command {
 
 pub struct CommandHandler {
 	command_prefix: String,
-	commands: HashMap<String, Command>,
+	commands: HashMap<String, Rc<Command>>,
 	discord: Rc<Discord>,
 	libraries: Vec<libloading::Library>,
 }
@@ -43,28 +56,26 @@ impl CommandHandler {
 		}
 	}
 
-	pub fn load_library<S: Into<String>>(&mut self, name: S) -> Result<(), io::Error> {
-		let lib = try!(libloading::Library::new(name.into()));
-		unsafe {
-			let setup: libloading::Symbol<unsafe extern "C" fn(&mut CommandHandler) > = try!(lib.get(b"setup"));
-			setup(self);
-		}
-		self.libraries.push(lib);
-		Ok(())
+	pub fn register(&mut self, cmd: Rc<Command>) {
+		self.commands.insert(cmd.name.clone(), cmd);
 	}
 
-	pub fn register<S: Into<String>>(&mut self, name: S, cmd: Command) {
-		self.commands.insert(name.into(), cmd);
-	}
+	// pub fn unregister(&mut self, cmd: Rc<Command>) {
+		
+	// }
 
 	pub fn handle_message(&self, message: &Message) -> bool {
 		if message.content.starts_with(&self.command_prefix) {
 			let rest = &message.content[self.command_prefix.len()..];
 
+			let context = Context {
+				discord: self.discord.clone(),
+				message: message
+			};
 
 			match self.commands.get(&rest.to_owned()) {
 				Some(command) => {
-					(command.invoke)(&self.discord, &message);
+					(command.invoke)(&context);
 					true
 				},
 				None => false,

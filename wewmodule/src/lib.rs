@@ -2,19 +2,26 @@
 extern crate dango;
 extern crate discord;
 
-use discord::Discord;
-use discord::model::Message;
-use dango::commandhandler::{CommandHandler, Command};
+use dango::error::Result;
+use dango::commands::Context;
+use dango::commands::Command;
+use dango::module::ModuleConfig;
 
-pub fn lad(c: &Discord, m: &Message) {
-	c.send_message(&m.channel_id, "lad", "", false);
+pub fn lad(c: &Context) -> Result<()> {
+	try!(c.say("lad"));
+	Ok(())
 }
 
 #[no_mangle]
-pub fn setup(ch: &mut CommandHandler) {
-	ch.register("wew", Command::new(lad));
-
-	ch.register("lel", Command::new(|discord, message| {
-		discord.send_message(&message.channel_id, "haha", "", false);
-	}));
+pub fn get_config() -> ModuleConfig {
+	ModuleConfig {
+		commands: vec![
+			Command::new("wew", lad),
+			Command::new("lel", |context| {
+				try!(context.say("haha"));
+				Ok(())
+			}),
+		],
+		command_handlers: vec![],
+	}
 }

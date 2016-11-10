@@ -7,18 +7,18 @@ use std::rc::Rc;
 use discord::{Discord, State};
 use discord::model::Message;
 use discord::model::Event;
-use dango::commandhandler::{Command, CommandHandler};
+use dango::module::Bot;
 
 pub fn main() {
-	let discord = Rc::new(Discord::from_bot_token(
+	let discord = Discord::from_bot_token(
 		&env::var("DISCORD_TOKEN").expect("Expect token")
-	).expect("login failed"));
+	).expect("login failed");
 
 
 	let (mut connection, ready) = discord.connect().expect("connect failed");
 	println!("[Ready] {} {}", ready.user.username, ready.servers.len());
 
-	let mut wew = CommandHandler::new("test ", discord);
+	let mut wew = Bot::new(discord);
 
 	wew.load_library("wewmodule/target/release/wewmodule").unwrap();
 
