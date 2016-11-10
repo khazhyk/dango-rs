@@ -29,11 +29,22 @@ pub struct Bot {
 impl Bot {
 	pub fn new(discord: Discord) -> Bot {
 		let d = Rc::new(discord);
-		Bot {
+		let mut bot = Bot {
 			discord: d.clone(),
 			root_command_handler: CommandHandler::new("!?", d.clone()),
 			modules: vec![],
-		}
+		};
+
+		bot.root_command_handler.register(Rc::new(Command::new("load", |context| {
+			// TODO - load and unload here.
+			Ok(())
+		})));
+
+		bot.root_command_handler.register(Rc::new(Command::new("unload", |context| {
+			Ok(())
+		})));
+
+		bot
 	}
 
 	pub fn load_library<S: Into<String>>(&mut self, name: S) -> Result<()> {

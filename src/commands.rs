@@ -13,6 +13,7 @@ use error::Error;
 pub struct Context<'a> {
 	discord: Rc<Discord>,
 	message: &'a Message,
+	tokens: Vec<&'a str>,
 }
 
 impl<'a> Context<'a> {
@@ -61,20 +62,27 @@ impl CommandHandler {
 	}
 
 	// pub fn unregister(&mut self, cmd: Rc<Command>) {
-		
+
 	// }
 
 	pub fn handle_message(&self, message: &Message) -> bool {
 		if message.content.starts_with(&self.command_prefix) {
 			let rest = &message.content[self.command_prefix.len()..];
 
-			let context = Context {
-				discord: self.discord.clone(),
-				message: message
-			};
+			let mut tokens = rest.split(" ");
+
+			let cmd = tokens.next();
+
+			let rest_tokens = tokens.collect();
 
 			match self.commands.get(&rest.to_owned()) {
 				Some(command) => {
+					let context = Context {
+						discord: self.discord.clone(),
+						message: message,
+						tokens: rest_tokens,
+					};
+
 					(command.invoke)(&context);
 					true
 				},
