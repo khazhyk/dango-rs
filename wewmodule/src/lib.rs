@@ -5,7 +5,7 @@ extern crate discord;
 use dango::error::Result;
 use dango::commands::Context;
 use dango::commands::Command;
-use dango::module::ModuleConfig;
+use dango::module::ModuleRegistration;
 
 pub fn lad(c: &Context) -> Result<()> {
 	try!(c.say("lad"));
@@ -13,15 +13,16 @@ pub fn lad(c: &Context) -> Result<()> {
 }
 
 #[no_mangle]
-pub fn get_config() -> ModuleConfig {
-	ModuleConfig {
-		commands: vec![
-			Command::new("wew", lad),
-			Command::new("lel", |context| {
-				try!(context.say("haha"));
-				Ok(())
-			}),
-		],
-		command_handlers: vec![],
-	}
+pub fn setup(reg: &mut ModuleRegistration) {
+	reg.register_command(Command::new("wew", lad));
+
+	reg.register_command(Command::new("lel", |context| {
+		try!(context.say("haha"));
+		Ok(())
+	}));
+
+	reg.register_command(Command::new("newcmd", |context| {
+		try!(context.say("without restarting"));
+		Ok(())
+	}));
 }

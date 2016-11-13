@@ -20,7 +20,8 @@ pub fn main() {
 
 	let mut wew = Bot::new(discord);
 
-	//wew.load_library("wewmodule/target/debug/wewmodule").unwrap();
+	wew.load_library("wewmodule/target/debug/wewmodule").unwrap();
+	wew.unload_library("wewmodule/target/debug/wewmodule").unwrap();
 
 	loop {
 		let event = match connection.recv_event() {
@@ -37,6 +38,11 @@ pub fn main() {
 
 		match event {
 			Event::MessageCreate(message) => {
+				if message.content == "!?load" {
+					wew.load_library("wewmodule/target/debug/wewmodule").unwrap();
+				} else if message.content == "!?unload" {
+					wew.unload_library("wewmodule/target/debug/wewmodule").unwrap();
+				}
 				wew.handle_message(&message);
 			}
 			_ => {},

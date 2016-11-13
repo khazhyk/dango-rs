@@ -61,9 +61,9 @@ impl CommandHandler {
 		self.commands.insert(cmd.name.clone(), cmd);
 	}
 
-	// pub fn unregister(&mut self, cmd: Rc<Command>) {
-
-	// }
+	pub fn unregister(&mut self, cmd: Rc<Command>) {
+		self.commands.remove(&cmd.name);
+	}
 
 	pub fn handle_message(&self, message: &Message) -> bool {
 		if message.content.starts_with(&self.command_prefix) {
